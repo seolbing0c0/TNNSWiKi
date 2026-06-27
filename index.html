@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <title>TNNS</title>
+<style>
+:root {
+    --wiki-main-color: #1f1f1f; 
+    --wiki-text-color: #ffffff;
+    --wiki-link-color: #0275d8;
+    --wiki-border-color: #ddd;
+    --wiki-bg-gray: #eee;
+    --wiki-max-width: 700px;
+    --wiki-font-size: 15px;
+    --wiki-line-height: 1.5;
+}
+
+#wikiwrap {
+    --wiki-main-color: #1f1f1f; 
+}
+
+.wiki-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.wiki-main-table {
+    order: 1;
+}
+
+.wiki-index {
+    order: 2;
+}
+
+@media (min-width: 768px) {
+    .wiki-container {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .wiki-index {
+        order: 1;
+        flex: 0 0 250px;
+        top: 20px;
+    }
+
+    .wiki-main-table {
+        order: 2;
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+#wikiwrap {
+    font-family: "Pretendard JP Variable", "Pretendard JP", "Pretendard", Pretendard, 
+                 -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", 
+                 "Segoe UI", "Hiragino Sans", "Apple SD Gothic Neo", Meiryo, 
+                 "Noto Sans JP", "Noto Sans KR", "Malgun Gothic", Osaka, 
+                 "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+    box-sizing: border-box;
+    font-size: var(--wiki-font-size);
+    line-height: var(--wiki-line-height);
+    max-width: var(--wiki-max-width);
+    margin: 0 auto;
+}
+
+#wikiwrap a,
+.text1 a,
+.wiki-category a,
+.wiki-index a {
+    color: var(--wiki-link-color);
+    text-decoration: none;
+}
+
+#wikiwrap a::before,
+#wikiwrap a::after,
+.text1 a::before,
+.wiki-category a::before,
+.wiki-index a::before {
+    content: none !important;
+}
+
+.wiki-toggle-btn {
+    color: inherit !important;
+    text-decoration: none !important;
+    cursor: pointer;
+}
+
+.wiki-main-table {
+    border-collapse: collapse;
+    width: 100%;
+    border: 2px solid var(--wiki-main-color);
+    font-size: 0.96em;
+    line-height: var(--wiki-line-height);
+    margin: 20px 0 16px;
+}
+
+.wt-name {
+    padding: 5px 10px;
+    border: 2px solid var(--wiki-main-color);
+    text-align: center;
+    background-color: var(--wiki-main-color);
+    color: var(--wiki-text-color);
+}
+
+.wt-copyright {
+    padding: 5px 10px;
+    border: 1px solid var(--wiki-border-color);
+    text-align: center;
+    color: #000;
+}
+
+.wt-color {
+    width: 30%;
+    padding: 5px 10px;
+    border: 1px solid var(--wiki-border-color);
+    border-right: 1px solid var(--wiki-border-color);
+    border-bottom: 1px solid var(--wiki-border-color);
+    text-align: center;
+    background-color: var(--wiki-main-color);
+    color: var(--wiki-text-color);
+}
+
+.wt-detail {
+    padding: 5px 10px;
+    border: 1px solid var(--wiki-border-color);
+    border-bottom: 1px solid var(--wiki-border-color);
+    text-align: left;
+    color: #000;
+}
+
+.wiki-main-table tr:last-child > td {
+    border-bottom: none;
+}
+
+summary {
+    list-style-type: none;
+    opacity: 0.5;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+}
+
+summary::-webkit-details-marker {
+    display: none;
+}
+
+details[open] summary {
+    opacity: 1;
+}
+
+.wiki-h1-icon ion-icon,
+.wiki-h2-icon ion-icon,
+.wiki-h3-icon ion-icon {
+    transition: transform 0.3s ease;
+    transform: rotate(-90deg);
+}
+
+details[open] .wiki-h1-icon ion-icon,
+details[open] .wiki-h2-icon ion-icon,
+details[open] .wiki-h3-icon ion-icon {
+    transform: rotate(0deg);
+}
+
+.text1 {
+    font-size: var(--wiki-font-size);
+    line-height: var(--wiki-line-height);
+}
+
+.wiki-category {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: normal;
+    line-height: var(--wiki-line-height);
+    margin: 0 0 1em;
+    padding: 0.2rem 0.5rem;
+}
+
+.wiki-h1 {
+    font-size: 1.8em;
+    border-bottom: 1px solid #ccc;
+    margin: 1.2em 0 0.7em;
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+
+.wiki-h2 {
+    font-size: 1.6em;
+    border-bottom: 1px solid #ccc;
+    margin: 1.2em 0 0.7em;
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+
+.wiki-h3 {
+    font-size: 1.4em;
+    border-bottom: 1px solid #ccc;
+    margin: 1.2em 0 0.7em;
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+
+.wiki-h1-icon,
+.wiki-h2-icon,
+.wiki-h3-icon {
+    color: #666;
+    float: left;
+    font-weight: 400;
+    line-height: 1em;
+    text-align: center;
+    width: 0.9em;
+    margin-right: 0.4em;
+    margin-top: 0.2em;
+}
+
+.wiki-index {
+    border-collapse: collapse;
+    width: auto;
+    max-width: 250px;
+    border: 1px solid #ccc;
+    margin: 0 0 20px 5px;
+    line-height: 1.8;
+}
+
+.wiki-quote {
+    border-collapse: collapse;
+    width: auto;
+    height: auto;
+    margin: 1em 0;
+}
+
+.wiki-quote td {
+    width: 100%;
+    border: 2px dashed #ccc;
+    border-left: 5px solid var(--wiki-main-color);
+    background: var(--wiki-bg-gray);
+    padding: 1em;
+    line-height: 1.6;
+}
+
+.wiki-quote hr {
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 0.5em 0;
+}
+
+.wiki-footnote {
+    border-top: 1px solid #777;
+    margin: 1.5em 0;
+    padding: 0.5em 0;
+    font-size: 0.9em;
+}
+.wiki-footnote p {
+    margin: 5px 0;
+}
+
+.wikigreenicon {
+    background: green;
+    color: white;
+    padding: 0 0.08em;
+    font-size: var(--wiki-font-size);
+    vertical-align: middle;
+}
+
+.wikigreentext {
+    color: green;
+    vertical-align: middle;
+    font-size: var(--wiki-font-size);
+    line-height: var(--wiki-line-height);
+}
+
+.wikigreen:hover {
+    text-decoration: underline;
+    text-decoration-color: green;
+}
+
+.wiki-img-sing {
+    width: 100%;
+    margin: 1em 0;
+    border-collapse: collapse;
+    line-height: 0;
+}
+
+.wiki-img-sing td {
+    padding: 0;
+    border: 2px solid var(--wiki-main-color);
+}
+
+.wiki-img-sing img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.wiki-img-sing iframe {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    border-radius: 0;
+    box-shadow: none;
+}
+.wiki-img-sing iframe[src*="youtube.com"] {
+    border-radius: 0 !important;
+}
+.wiki-fn-link {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    text-decoration: none !important;
+}
+.wiki-fn-tooltip {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 8px 12px;
+    width: max-content;
+    max-width: 250px;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-align: left;
+    white-space: normal;
+    margin-bottom: 8px; 
+    
+    font-size: calc(var(--wiki-font-size) * 0.9);
+    line-height: var(--wiki-line-height);
+    font-weight: normal !important;
+}
+
+.wiki-fn-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: #ccc transparent transparent transparent; 
+}
+
+@media (min-width: 768px) {
+    .wiki-fn-link:hover .wiki-fn-tooltip {
+        display: block;
+    }
+}
+
+.wiki-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 99998;
+}
+.wiki-modal-overlay.active {
+    display: block;
+}
+.wiki-modal-box {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+    width: 80%;
+    max-width: 300px;
+    z-index: 99999;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    
+    font-size: calc(var(--wiki-font-size) * 0.9);
+    line-height: var(--wiki-line-height);
+    font-weight: normal !important;
+}
+</style>
+<div id="wikiwrap">
+  
+      <div style="margin-bottom: 1.5rem;">
+        <h1 style="font-size: 2.25rem; font-weight: 700; line-height: 1; margin: 0;">다음 역은 없습니다</h1>
+        <p style="font-size: .9rem; margin: .5rem 0 0; color: rgb(85, 85, 85);">최근 수정 시각: <time>2026-06-28 01:43:34</time></p>
+      </div>
+  <div class="wiki-category" style="display: flex; align-items: center; flex-wrap: wrap;">분류:&nbsp; <a href="https://namu.wiki/w/%EB%B9%84%EC%A3%BC%EC%96%BC%20%EB%85%B8%EB%B2%A8" target="_blank">비주얼 노벨</a></div>
+  
+  <div class="wiki-container">
+    <table class="wiki-main-table">
+      <tbody>
+        <tr>
+          <td class="wt-name" colspan="2">
+            <b><span style="font-size: 20px;">다음 역은 없습니다</span></b><br />
+            <b><span style="font-size: 13px; line-height: 180%;"><ruby>There is No Next Stop<rt></rt></ruby> <ruby>| 次の駅はありません<rt></rt></ruby></span></b>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" style="padding: 0; border: 2px solid var(--wiki-main-color); border-bottom: var(--wiki-border-color);">
+            <div style="text-align: center;">
+              <img src="https://i.imgur.com/fB1UoAt.jpeg" width="100%" style="display:block;" />
+            </div>
+          </td>
+        </tr>
+        
+        <tr><td class="wt-color">개발</td><td class="wt-detail">HANPAGE</td></tr>
+<tr><td class="wt-color">유통</td><td class="wt-detail"><span style="font-size: 13.6px;">HANPAGE</span></td></tr>
+<tr><td class="wt-color">유통 채널</td><td class="wt-detail"><a href="https://namu.wiki/w/Steam" target="_blank">Steam</a></td></tr>
+<tr><td class="wt-color">장르</td><td class="wt-detail"><a href="https://namu.wiki/w/%ED%98%B8%EB%9F%AC%20%EA%B2%8C%EC%9E%84" target="_blank">공포</a>, <a href="https://namu.wiki/w/%EB%B9%84%EC%A3%BC%EC%96%BC%20%EB%85%B8%EB%B2%A8" target="_blank">비주얼 노벨</a>, <a href="https://namu.wiki/w/%EC%96%B4%EB%93%9C%EB%B2%A4%EC%B2%98%20%EA%B2%8C%EC%9E%84" target="_blank">어드벤처</a>, <a href="https://namu.wiki/w/%EC%9D%B8%EB%94%94%20%EA%B2%8C%EC%9E%84" target="_blank">인디</a></td></tr>
+<tr><td class="wt-color">출시</td><td class="wt-detail">2026년 8월 예정</td></tr>
+<tr><td class="wt-color">엔진</td><td class="wt-detail"><a href="https://namu.wiki/w/%EC%9C%A0%EB%8B%88%ED%8B%B0(%EA%B2%8C%EC%9E%84%20%EC%97%94%EC%A7%84)" target="_blank">Unity</a></td></tr>
+<tr><td class="wt-color">심의 등급</td><td class="wt-detail">?</td></tr>
+<tr><td class="wt-color">관련 사이트</td><td class="wt-detail"><a href="https://store.steampowered.com/app/4433800/There_Is_No_Next_Stop/" target="_blank">스팀</a>, <a href="https://x.com/nonextstop" target="_blank">트위터</a>, <a href="https://www.youtube.com/@hanpage001" target="_blank">유튜브</a></td></tr>
+
+      </tbody>
+    </table>
+    
+        <table class="wiki-index">
+        <tbody>
+        <tr style="padding: 0 20px;">
+        <td style="width: 100%; margin-left: 5px; padding: 12px 20px 18px 20px; font-size: .95rem; line-height: 1.5; position: relative;">
+        <div onclick="(function(header){var body=header.closest('td').querySelector('.wiki-index-body');var btn=header.querySelector('button');var isOpen=body.style.display!=='none';body.style.display=isOpen?'none':'block';if(btn)btn.style.transform=isOpen?'rotate(90deg)':'rotate(0deg)';})(this)" style="display: flex; align-items: center; justify-content: space-between; margin-left: -5px; margin-bottom: 4px; cursor: pointer;" title="접기/펼치기">
+        <div><a name="목차"></a><span style="font-size: 1.25em;">목차</span></div>
+        <button style="background:none;border:none;cursor:pointer;padding:2px 4px;color:#555;transition:transform 0.25s ease;display:flex;align-items:center;"><ion-icon name="chevron-down-outline" style="font-size:1.4em;"></ion-icon></button>
+        </div>
+        <div class="wiki-index-body">
+        <a style="padding-left: 0px;" href="#목차1-">1.</a> 개요<br />
+<a style="padding-left: 0px;" href="#목차2-">2.</a> 시스템 요구 사항<br />
+<a style="padding-left: 0px;" href="#목차3-">3.</a> 특징<br />
+<a style="padding-left: 0px;" href="#목차4-">4.</a> 등장인물<br />
+<a style="padding-left: 20px;" href="#목차4-1">4.1</a> 플레이어 캐릭터<br />
+<a style="padding-left: 20px;" href="#목차4-2">4.2</a> 안내자<br />
+<a style="padding-left: 40px;" href="#목차4-2-1">4.2.1</a> 첫 번째 안내자, 피안<br />
+
+        </div>
+        </td></tr></tbody></table>
+  </div>
+  <details open style="display:none;"><summary></summary>
+<table class="text1" style="border-collapse: collapse; width: 100%; border: 1px solid #dddddd;" data-ke-align="alignLeft"><tbody><tr><td style="width: 100%; border: 1px solid gray; border-top: 5px solid orange; padding: 12px;"><span style="font-size: 1.3em;">이 문서에</span> <a style="color: #0275d8; font-size: 1.3em;" href="https://namu.wiki/w/%EC%8A%A4%ED%8F%AC%EC%9D%BC%EB%9F%AC" target="_blank" rel="noopener">스포일러</a><span style="font-size: 1.3em;">가 포함되어 있습니다.</span><br /><br />이 문서가 설명하는 작품이나 인물 등에 대한 줄거리, 결말, 반전 요소 등을 직·간접적으로 포함하고 있습니다.</td></tr></tbody></table>
+</details>
+<details open><summary class="text1"><h2 class="wiki-h1"><span style="float: right; color: var(--wiki-link-color); font-size: 0.85rem; margin-top: 0.2em; cursor: pointer; text-decoration: none !important;">[편집]</span><span class="wiki-h1-icon"><ion-icon name="chevron-down-outline"></ion-icon></span> <a name="목차1-"></a><a href="#목차">1.</a> 개요</h2></summary>
+<table class="wiki-img-sing"><tbody><tr><td style="border-color: #1f1f1f;"><iframe src="https://www.youtube.com/embed/gq4f4w-8anU" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" frameborder="0" allowfullscreen="true"></iframe></td></tr></tbody></table>
+<table class="wiki-quote"><tbody><tr><td class="text1" style="border-left: 5px solid #1f1f1f;"><div><b>"목적지도 출구도 없는 이곳에서 당신은 가장 잊고 싶었던 기억과 마주해야 한다."</b></div><div><br></div><div>당신은 ‘다음 역은 없습니다’라는 안내 방송과 함께 끝없는 지하철에 갇히게 됩니다. 조심하세요, 이 지하철에는 당신을 머리부터 발끝까지 와작와작 뜯어 먹는 기괴한 괴물, ‘식객’이 돌아다니니까요. 그나마 유일한 위안은 당신이 정체불명의 ‘안내자’들과 만났다는 겁니다. ‘안내자’들은 당신이 왜 이곳에 오게 되었는지 그 이유를 찾아 나서야만 한다고 말합니다. 이제 모든 것은 당신의 선택에 달렸다고.</div><div><b><br></b></div><div><b>당신은 누구를 믿을 건가요? 무엇을 선택할 건가요? 과연 이 영원한 악몽 속에서 무사히 탈출할 수 있을까요?</b></div></td></tr></tbody></table>
+<p class="text1">한국의 1인 스튜디오 HANPAGE의 인디 호러 비주얼 노벨. 약칭은 '다역없'.</p>
+</details>
+<details open><summary class="text1"><h2 class="wiki-h1"><span style="float: right; color: var(--wiki-link-color); font-size: 0.85rem; margin-top: 0.2em; cursor: pointer; text-decoration: none !important;">[편집]</span><span class="wiki-h1-icon"><ion-icon name="chevron-down-outline"></ion-icon></span> <a name="목차2-"></a><a href="#목차">2.</a> 시스템 요구 사항</h2></summary>
+<table style="border-collapse:collapse;width:100%;margin:1em 0; border: 2px solid #cccccc;"><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;width:161px;"><span style="color: rgb(255, 255, 255);">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style="font-weight: bold;">&nbsp; &nbsp;구분</span></span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;width:322px;"><span style="color: rgb(255, 255, 255);">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style="font-weight: bold;"> 최소 사양</span></span></td></tr><tr><td colspan="3" style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="color: rgb(255, 255, 255);">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style="font-weight: bold;">&nbsp; Windows</span></span></td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;height:35px;"><span style="color: rgb(255, 255, 255); font-size: 14.4px; background-color: rgb(31, 31, 31);">&nbsp; &nbsp; &nbsp;&nbsp;<span style="font-weight: bold;">&nbsp; &nbsp; &nbsp;&nbsp;</span></span><span style="color: rgb(255, 255, 255); font-weight: bold;">운영체제</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;height:35px;">Windows 10 이상</td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;height:35px;"><span style="color: rgb(255, 255, 255); font-size: 14.4px; background-color: rgb(31, 31, 31);">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;</span><span style="color: rgb(255, 255, 255); font-weight: bold;">프로세서</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;width:161px;">2.0 GHz Dual Core</td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;height:35px;"><span style="color: rgb(255, 255, 255); font-size: 14.4px; background-color: rgb(31, 31, 31);">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style="font-weight: bold;">&nbsp;</span></span><span style="color: rgb(255, 255, 255); font-weight: bold;">메모리</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;">4 GB RAM</td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="color: rgb(255, 255, 255); font-size: 14.4px; background-color: rgb(31, 31, 31);">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span><span style="color: rgb(255, 255, 255); font-weight: bold;">그래픽 카드</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;">DirectX 9/OpenGL 4.1 capable GPU</td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="color: rgb(255, 255, 255); font-size: 14.4px; background-color: rgb(31, 31, 31);">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style="font-weight: bold;"> &nbsp; &nbsp;&nbsp;</span></span><span style="color: rgb(255, 255, 255); font-weight: bold;">API</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;">DirectX 9.0c</td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="color: rgb(255, 255, 255); font-size: 14.4px; background-color: rgb(31, 31, 31);">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style="font-weight: bold;">&nbsp;&nbsp;</span></span><span style="color: rgb(255, 255, 255); font-weight: bold;">저장공간</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;">1GB</td></tr></table>
+</details>
+<details open><summary class="text1"><h2 class="wiki-h1"><span style="float: right; color: var(--wiki-link-color); font-size: 0.85rem; margin-top: 0.2em; cursor: pointer; text-decoration: none !important;">[편집]</span><span class="wiki-h1-icon"><ion-icon name="chevron-down-outline"></ion-icon></span> <a name="목차3-"></a><a href="#목차">3.</a> 특징</h2></summary>
+</details>
+<details open><summary class="text1"><h2 class="wiki-h1"><span style="float: right; color: var(--wiki-link-color); font-size: 0.85rem; margin-top: 0.2em; cursor: pointer; text-decoration: none !important;">[편집]</span><span class="wiki-h1-icon"><ion-icon name="chevron-down-outline"></ion-icon></span> <a name="목차4-"></a><a href="#목차">4.</a> 등장인물</h2></summary>
+</details>
+<details open><summary class="text1"><h2 class="wiki-h2"><span style="float: right; color: var(--wiki-link-color); font-size: 0.85rem; margin-top: 0.2em; cursor: pointer; text-decoration: none !important;">[편집]</span><span class="wiki-h2-icon"><ion-icon name="chevron-down-outline"></ion-icon></span> <a name="목차4-1"></a><a href="#목차">4.1</a> 플레이어 캐릭터</h2></summary>
+<table class="wiki-img-sing"><tbody><tr><td style="border-color: #1f1f1f;"><img src="https://i.imgur.com/nEuPe1F.jpeg"></td></tr></tbody></table>
+<p class="text1"><span style="font-weight: bold;">플레이어(주인공) 캐릭터:&nbsp;</span><span style="font-weight: bold; font-size: 0.95em;">미아</span><div><br></div><div>당신은 고3 학생 '미아'가 되어서 이 게임을 플레이하게 됩니다. ‘다음 역은 없습니다’라는 안내 방송과 함께 끝없는 지하철에 갇히게 된 당신. 조심하세요, 이 지하철에는 당신을 머리부터 발끝까지 와작와작 뜯어 먹는 기괴한 괴물, ‘식객’이 돌아다니니까요. 그나마 유일한 위안은 당신이 정체불명의 ‘안내자’들과 만났다는 겁니다. ‘안내자’들은 당신이 왜 이곳에 오게 되었는지 그 이유를 찾아 나서야만 한다고 말합니다. 이제 모든 것은 당신의 선택에 달렸다고.&nbsp;</div><span contenteditable="false" style="display: inline-block; white-space: nowrap;">
+            <a class="wikigreen" href="https://x.com/nonextstop/status/2005923280189022289?s=20" target="_blank">
+                <ion-icon class="wikigreenicon md hydrated" name="link" role="img"></ion-icon>
+                <span class="wikigreentext">#</span>
+            </a>
+        </span>&nbsp;<div><br></div></p>
+<table style="border-collapse:collapse;width:100%;margin:1em 0; border: 2px solid #cccccc;"><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="color: rgb(255, 255, 255); font-weight: bold;">나이</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;">19세</td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;height:35px;"><span style="color: rgb(255, 255, 255); font-weight: bold;">성별</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;">여성</td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="color: rgb(255, 255, 255); font-weight: bold;">신장</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;">159cm</td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="color: rgb(255, 255, 255); font-weight: bold;">성우</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;"><a href="https://x.com/miryu_voice1018" target="_blank" style="font-size: 15.2px; background-color: rgba(141, 39, 174, 0.02);">최승희</a><span style="font-size: 15.2px; background-color: rgba(141, 39, 174, 0.02);"><a name="돌아가기-fn-label-1"></a><a href="#각주-fn-label-1" class="wiki-fn-link" onclick="openWikiModal(event, this)"><sup>[팬더빙]</sup><span class="wiki-fn-tooltip"><span style="color: var(--wiki-link-color);">[팬더빙]</span> <span style="color: #333;">홍매의 성우가 녹음했다.</span></span></a></span></td></tr></table>
+<p class="text1"><div style="font-size: 15.2px;"><br></div><div style="font-size: 15.2px;">게임 시작 시점에서 기억을 잃고 시작한다.</div><span contenteditable="false" style="font-size: 15.2px; white-space: nowrap; display: inline-block;"><a class="wikigreen" href="https://x.com/nonextstop/status/2005978155702706331" target="_blank" draggable="false"><ion-icon class="wikigreenicon md hydrated" name="link" role="img" style="font-size: 15px;"></ion-icon><span class="wikigreentext" style="font-size: 15px; line-height: 1.5;">#</span></a></span><span style="font-size: 15.2px;">&nbsp;</span></p>
+</details>
+<details open><summary class="text1"><h2 class="wiki-h2"><span style="float: right; color: var(--wiki-link-color); font-size: 0.85rem; margin-top: 0.2em; cursor: pointer; text-decoration: none !important;">[편집]</span><span class="wiki-h2-icon"><ion-icon name="chevron-down-outline"></ion-icon></span> <a name="목차4-2"></a><a href="#목차">4.2</a> 안내자</h2></summary>
+<table class="wiki-img-sing"><tbody><tr><td style="border-color: #1f1f1f;"><iframe src="https://www.youtube.com/embed/ITvghsGadwo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" frameborder="0" allowfullscreen="true"></iframe></td></tr></tbody></table>
+<p class="text1"><div>안내자 중앙 관리국(Transit Guidance Authority)에서 복무하며 경계에 진입한 일반인들을 무사히 안내하는 사명을 지닌 자들. 저마다 고유 번호가 있다. 현재까지 밝혀진 안내자명은 모두 실존 꽃에서 비롯했으며, 안내자들은 해당 꽃이 몸에 피어나는 상태 이상 '개화'를 겪을 수 있다. 핵이 파괴되지 않는 한 몇 번이고 소생 가능하나, 일정 수준을 넘어 침식된 안내자는 즉시 폐기해야 한다.</div><div><br></div><div>안내자의 상위 직급으로는 '감독관'이 존재한다. 감독관은 규율을 위반한 안내자에게 징계를 내리며, 완전 침식이 확인된 개체를 즉시 폐기하는 특별 관리 업무를 수행한다. 인게임에서 직접적으로 등장하진 않을 예정이다.</div><span contenteditable="false" style="display: inline-block; white-space: nowrap;">
+            <a class="wikigreen" href="https://x.com/nonextstop/status/2027210068002046031" target="_blank">
+                <ion-icon class="wikigreenicon md hydrated" name="link" role="img"></ion-icon>
+                <span class="wikigreentext">#</span>
+            </a>
+        </span>&nbsp;<div><br></div></p>
+<div class="wiki-toggle-wrap text1"><p><a class="wiki-toggle-btn" href="javascript:void(0)" onclick="(function(btn){var w=btn.closest('.wiki-toggle-wrap'); var b=w.querySelector('.wiki-toggle-body'); var isOpen=b.style.display!=='none'; b.style.display=isOpen?'none':'block'; btn.innerHTML=isOpen?btn.dataset.openLabel:btn.dataset.closeLabel;})(this)" data-open-label="<span style=&quot;font-weight: bold;&quot;>안내자 행동 강령 [펼치기 · 접기]</span>" data-close-label="<span style=&quot;font-size: 13.12px; font-weight: bold;&quot;>안내자 행동 강령 [펼치기 · 접기]</span>" style="color: #000000 !important; text-decoration: none !important; cursor: pointer;"><span style="font-weight: bold;">안내자 행동 강령 [펼치기 · 접기]</span></a></p><div class="wiki-toggle-body" style="display:none; padding-top:8px;"><p class="text1"><div>[안내자 행동 강령]</div><div>&lt;Code of Conduct for Guides&gt;</div><div><br></div><div>제1조 [목적 및 사명] 모든 안내자는 ■■의 충실한 복무자로서, 사명감을 바탕으로 경계에 진입한 일반인을 무사히 안내해야 합니다.</div><div><br></div><div>제2조 [신분 은닉의 원칙] 모든 안내자는 ■■의 충실한 복무자로서, 진짜 이름도 과거의 삶도 전부 잊어야 합니다.</div><div><br></div><div>제3조 [방해 요소 '식객' 대응] 경로상에서 마주치는 모든 '식객'을 제거하고 처리하십시오. 식객과 교전할 때는 일반인들이 공포를 느끼지 않도록 주의하십시오. 만약 동행자가 공황에 빠져 이성을 잃을 시, ■■■■■■■할 수 있으니 부디 유의를 거듭하시길 바랍니다.</div><div><br></div><div>제4조 [침식 현상 식별] 식객과의 접촉으로 발생하는 '침식'은 안내자의 인격을 마비시킵니다. 일정 수준을 넘어 침식된 안내자는 즉시 폐기해야 합니다. 다음 징후를 스스로 점검하십시오.</div><div><br></div><div>- 안내해야 할 사람들이 보호 대상이 아닌, '신선한 고기'로 보이기 시작할 때.</div><div>- 자신의 그림자가 본인의 움직임을 따라가지 않고 따로 움직일 때.</div><div>- 상부의 지시보다 참을 수 없는 허기가 먼저라고 생각될 때.</div><div><br></div><div>제5조 [존재하지 않는 5조]</div><div>본 강령 제5조는 존재하지 않습니다. 만약 이 문서에서 "사람들을 조금씩 뜯어먹으며 허기를 달래면 계속 일할 수 있다"는 내용의 5조를 발견했다면, 즉시 자신의 손발을 구속하고 상부의 처분을 기다리십시오.</div></p>
+</div></div>
+</details>
+<details open><summary class="text1"><h2 class="wiki-h3"><span style="float: right; color: var(--wiki-link-color); font-size: 0.85rem; margin-top: 0.2em; cursor: pointer; text-decoration: none !important;">[편집]</span><span class="wiki-h3-icon"><ion-icon name="chevron-down-outline"></ion-icon></span> <a name="목차4-2-1"></a><a href="#목차">4.2.1</a> 첫 번째 안내자, 피안</h2></summary>
+<table class="wiki-img-sing"><tbody><tr><td style="border-color: #1f1f1f;"><img src="https://i.imgur.com/RDk76ZZ.jpeg"></td></tr></tbody></table>
+<p class="text1"><span style="font-weight: bold;">“저만 믿으세요! 제가 ‘안내자’의 사명을 다해 당신을 반드시 다음 역으로 이끌어줄 테니까요.”</span><div><br></div><div>당신이 지하철에서 처음 만나게 되는 정체불명의 안내자. 호감 가는 인상의 번듯한 미남이다. '식객'에게 쫓겨 위험에 처한 당신을 구해주며 등장한다. 다정하고 친절한 태도로, 마치 모든 걸 알고 있다는 듯 당신을 이끈다. 그가 내민 손은 이 지옥 같은 곳에서 유일한 구원 같다. 당신은 무심코 그를 온전히 믿고 모든 것을 맡긴 채 따라가고 싶어진다.&nbsp;</div><span contenteditable="false" style="display: inline-block; white-space: nowrap;">
+            <a class="wikigreen" href="https://x.com/nonextstop/status/2001224446334370290?s=20" target="_blank">
+                <ion-icon class="wikigreenicon md hydrated" name="link" role="img"></ion-icon>
+                <span class="wikigreentext">#</span>
+            </a>
+        </span>&nbsp;</p>
+<table style="border-collapse:collapse;width:100%;margin:1em 0; border: 2px solid #cccccc;"><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;width:161px;"><span style="color: rgb(255, 255, 255); font-weight: bold;">이름</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;width:161px;"><a href="https://namu.wiki/w/%EC%84%9D%EC%82%B0" target="_blank">피안</a> | 彼岸 | Lycoris | ヒガンバナ</td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;width:161px;height:35px;"><span style="color: rgb(255, 255, 255); font-weight: bold;">이전 이름</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;">정재희(鄭在熙) / Jeong Jaehee</td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;height:35px;"><span style="color: rgb(255, 255, 255); font-weight: 700;">고유 번호</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="font-size: 14.4px; font-weight: 700;">L-404-0401</span></td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="font-weight: bold; color: rgb(255, 255, 255);">생년월일</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="font-size: 14.4px;">1994년 4월 1일</span></td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="color: rgb(255, 255, 255); font-weight: bold;">성별</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="font-size: 14.4px;">남성</span></td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="color: rgb(255, 255, 255); font-weight: bold;">신장</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;height:24px;"><span style="font-size: 14.4px; background-color: rgb(255, 255, 255);">180cm</span></td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;height:35px;"><span style="color: rgb(255, 255, 255); font-size: 14.4px; font-weight: 700; background-color: rgb(31, 31, 31);">사용 무기</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;">장검<br><img src="https://i.imgur.com/AtGDhTO.jpeg" style="max-width:100%; height:auto; display:block; margin:auto;"><div class="wiki-toggle-body" style="display:none; padding-top:4px;"><br></div><div class="wiki-toggle-body" style="display:none; padding-top:4px;"><br></div></td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="color: rgb(255, 255, 255); font-size: 14.4px; font-weight: 700; background-color: rgb(31, 31, 31);">이전 직업</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="font-size: 14.4px; background-color: rgb(255, 255, 255);">S대학교 의과대학 의학과 대학생</span></td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;height:34px;"><span style="color: rgb(255, 255, 255); font-size: 14.4px; font-weight: 700;">취미</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="font-size: 14.4px; background-color: rgb(255, 255, 255);">체스, 백야 퍼즐 맞추기</span></td></tr><tr><td style="border:1px solid rgb(204, 204, 204);background-color:rgb(31, 31, 31);padding:6px 10px;vertical-align:top;word-break:break-word;"><span style="color: rgb(255, 255, 255); font-size: 14.4px; font-weight: 700;">성우</span></td><td colspan="2" style="border:1px solid rgb(204, 204, 204);background-color:rgb(255, 255, 255);padding:6px 10px;vertical-align:top;word-break:break-word;"><a href="https://namu.wiki/w/%EC%A0%84%EB%B3%91%ED%95%98" target="_blank" style="font-size: 14.4px;">전병하</a></td></tr></table>
+<div class="wiki-toggle-wrap text1"><p><a class="wiki-toggle-btn" href="javascript:void(0)" onclick="(function(btn){var w=btn.closest('.wiki-toggle-wrap'); var b=w.querySelector('.wiki-toggle-body'); var isOpen=b.style.display!=='none'; b.style.display=isOpen?'none':'block'; btn.innerHTML=isOpen?btn.dataset.openLabel:btn.dataset.closeLabel;})(this)" data-open-label="<span style=&quot;font-size: 13.12px; font-weight: 700;&quot;>안내자 등록 계약서 [펼치기 · 접기]</span>" data-close-label="<span style=&quot;font-size: 13.12px; font-weight: 700;&quot;>안내자 등록 계약서 [펼치기 · 접기]</span>" style="color: #000000 !important; text-decoration: none !important; cursor: pointer;"><span style="font-size: 13.12px; font-weight: 700;">안내자 등록 계약서 [펼치기 · 접기]</span></a></p><div class="wiki-toggle-body" style="display:none; padding-top:8px;"><table class="wiki-img-sing"><tbody><tr><td style="border-color: #1f1f1f;"><img src="https://i.imgur.com/NoBqTEU.jpeg"></td></tr></tbody></table>
+</div></div>
+</details>
+
+
+            <div class="text1 wiki-footnote">
+                <p><a name="각주-fn-label-1"></a><a href="#돌아가기-fn-label-1">[팬더빙]</a> 홍매의 성우가 녹음했다.</p>
+
+            </div>
+            <script>
+            function openWikiModal(e, el) {
+                if (window.innerWidth >= 768) return; 
+                e.preventDefault(); 
+                const existingOverlay = document.getElementById('wiki-fn-overlay');
+                if (existingOverlay) existingOverlay.remove();
+                const tooltipContent = el.querySelector('.wiki-fn-tooltip').innerHTML;
+                const overlay = document.createElement('div');
+                overlay.id = 'wiki-fn-overlay';
+                overlay.className = 'wiki-modal-overlay active';
+                const modal = document.createElement('div');
+                modal.className = 'wiki-modal-box';
+                modal.innerHTML = tooltipContent;
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) {
+                        overlay.remove();
+                    }
+                });
+            }
+            </script>
+        </div>
+    </body>
+    </html>
